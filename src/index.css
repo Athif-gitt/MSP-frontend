@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2563EB;
+  --color-background-light: #F9FAFB;
+  --color-background-dark: #111921;
+  --color-surface: #FFFFFF;
+  --color-borders: #E5E7EB;
+
+  --font-display: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Constraint: Avoid rounded corners exceeding 8px */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  /* 8px max */
+  --radius-xl: 0.5rem;
+  /* 8px max */
+  --radius-2xl: 0.5rem;
+  /* 8px */
+  --radius-3xl: 0.5rem;
+  /* 8px */
+  --radius-full: 9999px;
+  /* for avatars only */
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 8px;
+    /* Constraint */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+body {
+  font-family: var(--font-display);
+  background-color: var(--color-background-light);
+  color: #0f172a;
+}
