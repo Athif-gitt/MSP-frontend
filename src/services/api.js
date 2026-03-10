@@ -1,12 +1,32 @@
 import axios from "axios";
 import { getToken, getOrgId, getRefreshToken, setToken, logout } from "../utils/authStore";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
+  baseURL,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
+// Endpoints that do not require authentication headers
+const PUBLIC_ENDPOINTS = ["/auth/login/", "/auth/register/", "/auth/refresh/", "/auth/logout/"];
 
 /*
 REQUEST INTERCEPTOR
@@ -14,8 +34,16 @@ Attach access token + organization id
 */
 api.interceptors.request.use(
   (config) => {
+    const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
     const token = getToken();
     const orgId = getOrgId();
+
+    if (!isPublic) {
+      // Prevent unauthenticated API requests client-side
+      if (!token || !orgId) {
+        return Promise.reject(new axios.Cancel("Missing authentication or organization context. Request cancelled."));
+      }
+    }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -32,41 +60,77 @@ api.interceptors.request.use(
 
 /*
 RESPONSE INTERCEPTOR
-Auto refresh access token when 401 occurs
+Auto refresh access token when 401 occurs, with queueing and loop-prevention
 */
 api.interceptors.response.use(
   (response) => response,
 
   async (error) => {
+    // Ignore manually cancelled requests
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => originalRequest.url?.includes(endpoint));
+      if (isPublic) {
+        return Promise.reject(error);
+      }
+
+      const refreshToken = getRefreshToken();
+
+      if (!refreshToken) {
+        logout();
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        const refreshToken = getRefreshToken();
-
-        const response = await api.post("/auth/refresh/", {
+        // Use bare axios to avoid interceptor recursion and specify baseURL manually
+        const response = await axios.post(`${baseURL}/auth/refresh/`, {
           refresh: refreshToken,
         });
 
         const newAccessToken = response.data.access;
 
-        // save new access token
+        // save new access token in memory
         setToken(newAccessToken);
 
-        // update header and retry request
+        // retry queued requests
+        processQueue(null, newAccessToken);
+
+        // update original request header
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
       } catch (err) {
+        processQueue(err, null);
         logout();
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
       }
     }
 
     return Promise.reject(error);
   }
 );
-
 
 export default api;

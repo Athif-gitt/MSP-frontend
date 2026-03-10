@@ -1,10 +1,9 @@
-import { useState, useContext } from "react"
-import { AuthContext } from "../context/AuthContext"
+import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { login } from "../services/authService"
 
 export default function Login() {
 
-  const { login } = useContext(AuthContext)
   const navigate = useNavigate()
 
   const [email, setEmail] = useState("")
@@ -24,7 +23,7 @@ export default function Login() {
         password
       })
 
-      navigate("/projects")
+      navigate("/dashboard")
 
     } catch (err) {
       setError("Invalid credentials")
@@ -53,7 +52,7 @@ export default function Login() {
             placeholder="Email"
             className="w-full border rounded p-2"
             value={email}
-            onChange={(e)=>setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
 
@@ -62,7 +61,7 @@ export default function Login() {
             placeholder="Password"
             className="w-full border rounded p-2"
             value={password}
-            onChange={(e)=>setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
 

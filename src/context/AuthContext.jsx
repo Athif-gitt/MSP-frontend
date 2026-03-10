@@ -15,8 +15,6 @@ export const AuthProvider = ({ children }) => {
 
     const { access, organization_id, user } = data
 
-    setAuth(access, organization_id)
-
     setToken(access)
     setOrganizationId(organization_id)
     setUser(user)

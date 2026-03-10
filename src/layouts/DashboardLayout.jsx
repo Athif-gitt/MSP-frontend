@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar';
 
 const DashboardLayout = () => {
     return (
-        <div className="flex h-screen bg-[#F9FAFB] text-slate-900 font-display">
+        <div className="flex h-screen bg-background-light text-slate-900 font-display">
             <Sidebar />
             <div className="flex-1 flex flex-col overflow-hidden relative">
                 <Navbar />

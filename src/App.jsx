@@ -17,15 +17,23 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<DashboardLayout />}>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="projects" element={<Projects />} />
             <Route path="board" element={<KanbanBoard />} />
             <Route path="trash" element={<Trash />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
           </Route>
+
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

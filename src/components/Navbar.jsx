@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Bell, HelpCircle } from 'lucide-react';
+import ProfileDropdown from './ProfileDropdown';
 
 const Navbar = () => {
     return (
@@ -27,16 +28,7 @@ const Navbar = () => {
                     <HelpCircle size={20} strokeWidth={1.5} />
                 </button>
                 <div className="h-6 w-px bg-[#E5E7EB] mx-1"></div>
-                <div className="flex items-center gap-3 cursor-pointer group">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-sm font-medium text-slate-900 leading-none">Alex Thompson</p>
-                    </div>
-                    <img
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuANCrqpGkEfYikJHYF8UN-tetc1zDeShYBtSp1LdR15He7PhkfgkCDuWMISee_XK1UaK_dtuMqn1FbWDBt0hM6tzfHtX5C_3TB9N7NrUmGAtlZ7QU2LWdIlYMyC1M4gDC5oP1Bb_VKkpbHXLmsRXaBl4EWpE8J6VJ2I7E1bSWu4t5Uw2kBuCs8tWEoH-cHuySEDgIwgGq0NCp2UsCjey1GPuvsOuzCEES902KCKK3HvJS1DZKdWsz0lCAT61HhvJaLNn0UodxVCves"
-                        alt="User avatar"
-                        className="w-8 h-8 rounded-full object-cover border border-[#E5E7EB]"
-                    />
-                </div>
+                <ProfileDropdown />
             </div>
         </header>
     );
