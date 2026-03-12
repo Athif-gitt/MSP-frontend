@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
+import PermissionGuard from "../components/PermissionGuard";
+import { PERMISSIONS } from "../rbac/permissions";
 import {
   createProject,
   updateProject,
@@ -111,13 +113,15 @@ const Projects = () => {
           <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your organization's projects</p>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium shadow-sm hover:shadow"
-        >
-          <Plus className="w-4 h-4" />
-          Create Project
-        </button>
+        <PermissionGuard permission={PERMISSIONS.CREATE_PROJECT}>
+          <button
+            onClick={() => openModal()}
+            className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium shadow-sm hover:shadow"
+          >
+            <Plus className="w-4 h-4" />
+            Create Project
+          </button>
+        </PermissionGuard>
       </div>
 
       {isLoading ? (
@@ -132,13 +136,15 @@ const Projects = () => {
       ) : !projects?.length ? (
         <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50">
           <p className="text-gray-500 mb-4">No projects found</p>
-          <button
-            onClick={() => openModal()}
-            className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
-          >
-            <Plus className="w-4 h-4" />
-            Create your first project
-          </button>
+          <PermissionGuard permission={PERMISSIONS.CREATE_PROJECT}>
+            <button
+              onClick={() => openModal()}
+              className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+            >
+              <Plus className="w-4 h-4" />
+              Create your first project
+            </button>
+          </PermissionGuard>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -152,20 +158,24 @@ const Projects = () => {
                   {project.name}
                 </h3>
                 <div className="flex opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                  <button
-                    onClick={() => openModal(project)}
-                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                    title="Edit Project"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => openDeleteDialog(project)}
-                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                    title="Delete Project"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <PermissionGuard permission={PERMISSIONS.EDIT_PROJECT}>
+                    <button
+                      onClick={() => openModal(project)}
+                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                      title="Edit Project"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </PermissionGuard>
+                  <PermissionGuard permission={PERMISSIONS.DELETE_PROJECT}>
+                    <button
+                      onClick={() => openDeleteDialog(project)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                      title="Delete Project"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </PermissionGuard>
                 </div>
               </div>
 
