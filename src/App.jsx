@@ -1,10 +1,11 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./context/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
-import KanbanBoard from "./pages/KanbanBoard";
+import Board from "./pages/Board";
 import Trash from "./pages/Trash";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -15,27 +16,29 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="projects" element={<Projects />} />
-            <Route path="board" element={<KanbanBoard />} />
-            <Route path="trash" element={<Trash />} />
-          </Route>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="projects" element={<Projects />} />
+              <Route path="projects/:projectId/board" element={<Board />} />
+              <Route path="trash" element={<Trash />} />
+            </Route>
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
-      </BrowserRouter>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

@@ -5,6 +5,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 const api = axios.create({
   baseURL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -127,6 +128,11 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    if (error.response?.status === 403) {
+      // Step 6: API Error Handling for RBAC
+      alert("You do not have permission to perform this action.");
     }
 
     return Promise.reject(error);

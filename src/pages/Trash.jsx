@@ -1,9 +1,18 @@
 import React from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { Navigate } from "react-router-dom"
 import api from "../services/api"
+import { useAuth } from "../context/AuthContext"
+import { canViewTrash, canRestoreTask } from "../utils/permissions"
 
 const Trash = () => {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  // Protect route
+  if (!user || !canViewTrash(user?.role)) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   // Fetch trashed tasks
   const { data: trashedItems = [], isLoading } = useQuery({
@@ -116,15 +125,17 @@ const Trash = () => {
             </div>
 
             <div className="shrink-0 flex items-center gap-2">
-              <button
-                onClick={() => restoreMutation.mutate(item.id)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white rounded-lg text-sm font-semibold transition-all"
-              >
-                <span className="material-symbols-outlined text-[18px]">
-                  restore
-                </span>
-                <span className="hidden sm:inline">Restore</span>
-              </button>
+              {canRestoreTask(user?.role) && (
+                <button
+                  onClick={() => restoreMutation.mutate(item.id)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white rounded-lg text-sm font-semibold transition-all"
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    restore
+                  </span>
+                  <span className="hidden sm:inline">Restore</span>
+                </button>
+              )}
             </div>
 
           </div>

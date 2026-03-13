@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { User, Settings, LogOut } from 'lucide-react';
-import { getUser, logout as storeLogout } from '../utils/authStore';
-import { useCurrentUser } from "../hooks/useCurrentUser"
+import { useAuth } from '../context/AuthContext';
 
 export default function ProfileDropdown() {
     const [isOpen, setIsOpen] = useState(false);
@@ -11,15 +10,11 @@ export default function ProfileDropdown() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    // Get the user data from memory store. 
-    // Fallback to anonymous if refreshed (since it's memory-only).
-    const { data: user } = useCurrentUser()
+    const { user, logout } = useAuth()
 
-const displayName = user?.first_name
-  ? `${user.first_name} ${user.last_name || ""}`.trim()
-  : user?.email || "User"
-    // Try to display name, fallback to email
-    // const displayName = user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.email;
+    const displayName = user?.first_name
+      ? `${user.first_name} ${user.last_name || ""}`.trim()
+      : user?.email || "User"
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -36,11 +31,11 @@ const displayName = user?.first_name
         };
     }, [isOpen]);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         // Clear react-query cache completely
         queryClient.clear();
-        // Clear memory auth store and trigger redirect
-        storeLogout();
+        // Clear context and trigger redirect via protected route
+        await logout();
     };
 
     return (

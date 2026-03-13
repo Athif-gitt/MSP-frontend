@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
 import { useProjects } from "../hooks/useProjects";
@@ -189,6 +190,15 @@ const Projects = () => {
                   month: "short",
                   day: "numeric"
                 })}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                <Link
+                  to={`/projects/${project.id}/board`}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
+                >
+                  View Board
+                </Link>
               </div>
             </div>
           ))}

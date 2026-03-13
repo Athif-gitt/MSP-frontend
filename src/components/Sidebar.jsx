@@ -6,7 +6,6 @@ const Sidebar = () => {
     const navItems = [
         { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { to: '/projects', icon: FolderOpen, label: 'Projects' },
-        { to: '/board', icon: CheckSquare, label: 'Tasks' },
         { to: '#activity', icon: Activity, label: 'Activity' },
     ];
 
