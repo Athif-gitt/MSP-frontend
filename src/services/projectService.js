@@ -31,3 +31,11 @@ export const deleteProject = async (id) => {
   const res = await api.delete(`/projects/${id}/`);
   return res.data;
 };
+
+/*
+Fetch single project
+*/
+export const getProjectById = async (id) => {
+  const res = await api.get(`/projects/${id}/`);
+  return res.data;
+};

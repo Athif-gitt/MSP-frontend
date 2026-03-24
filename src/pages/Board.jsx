@@ -3,12 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Board from '../components/board/Board';
 import CreateTaskModal from '../components/tasks/CreateTaskModal';
 import { ChevronLeft } from 'lucide-react';
+import { getProjectById } from "../services/projectService";
+import { useQuery } from "@tanstack/react-query";
 
 const BoardPage = () => {
     const { projectId } = useParams();
     const navigate = useNavigate();
 
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+    const { data: project, isLoading } = useQuery({
+  queryKey: ["project", projectId],
+  queryFn: () => getProjectById(projectId),
+});
 
     return (
         <div className="flex flex-col h-full bg-[#F9FAFB]">
@@ -34,7 +41,7 @@ const BoardPage = () => {
                         </h1>
 
                         <p className="text-sm text-slate-500 font-medium">
-                            Project ID: {projectId}
+                            Project ID : {project?.public_id}
                         </p>
                     </div>
                 </div>

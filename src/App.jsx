@@ -9,6 +9,7 @@ import Board from "./pages/Board";
 import Trash from "./pages/Trash";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ function App() {
               <Route path="projects" element={<Projects />} />
               <Route path="projects/:projectId/board" element={<Board />} />
               <Route path="trash" element={<Trash />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
 
             <Route path="/login" element={<Login />} />

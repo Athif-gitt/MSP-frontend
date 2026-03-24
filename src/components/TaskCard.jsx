@@ -8,7 +8,7 @@ const TaskCard = ({ task, onClick }) => {
         >
             <div className="flex items-start justify-between mb-2">
                 <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
-                    {task.project_code || `TASK-${task.id.toString().padStart(2, '0')}`}
+                    {task.project?.public_id || `TASK-${task.id.slice(0, 4)}`}
                 </span>
             </div>
             <h4 className="text-sm font-medium text-slate-800 mb-4">{task.title}</h4>
