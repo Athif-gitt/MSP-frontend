@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Board from '../components/board/Board';
+import Board from '../features/tasks/components/Board';
 import CreateTaskModal from '../components/tasks/CreateTaskModal';
 import { ChevronLeft } from 'lucide-react';
 import { getProjectById } from "../services/projectService";
