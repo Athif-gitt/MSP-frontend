@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react"
 import { getCurrentUser, login as loginService, logout as logoutService } from "../services/authService"
+import { ROLE_PERMISSIONS } from "../rbac/permissions"
+import { getCurrentUserRole } from "../utils/permissions"
 
 export const AuthContext = createContext()
 
@@ -37,19 +39,30 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const logout = async () => {
-    await logoutService()
+  const logout = async (skipRedirect = false) => {
+    await logoutService(skipRedirect)
     setUser(null)
+  }
+
+  const can = (permission) => {
+    if (!user) return false
+    const orgId = localStorage.getItem("organization_id")
+    const role = getCurrentUserRole(user, orgId)
+    if (!role) return false
+    const permissions = ROLE_PERMISSIONS[role] || []
+    return permissions.includes(permission)
   }
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        isAuthenticated: !!user,
         setUser,
         login,
         logout,
-        isLoading
+        isLoading,
+        can
       }}
     >
       {children}

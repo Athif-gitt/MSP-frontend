@@ -1,11 +1,20 @@
-import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, Link, useLocation } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 
 export default function Login() {
 
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const location = useLocation()
+  const { login, user } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      const searchParams = new URLSearchParams(location.search)
+      const next = searchParams.get('next')
+      navigate(next || "/dashboard", { replace: true })
+    }
+  }, [user, navigate, location.search])
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -24,7 +33,9 @@ export default function Login() {
         password
       })
 
-      navigate("/dashboard")
+      const searchParams = new URLSearchParams(location.search)
+      const next = searchParams.get('next')
+      navigate(next || "/dashboard")
 
     } catch (err) {
       setError("Invalid credentials")
@@ -77,7 +88,7 @@ export default function Login() {
 
         <p className="text-sm text-center mt-4">
           Don't have an account?{" "}
-          <Link className="text-blue-600" to="/signup">
+          <Link className="text-blue-600" to="/register">
             Sign up
           </Link>
         </p>

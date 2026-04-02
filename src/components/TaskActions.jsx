@@ -1,13 +1,16 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { canDeleteTask } from '../utils/permissions';
+import { canDeleteTask, getCurrentUserRole } from '../utils/permissions';
 import { Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
+import { getOrgId } from '../utils/authStore';
 
 const TaskActions = ({ task }) => {
     const { user } = useAuth();
     const queryClient = useQueryClient();
+    const currentOrgId = getOrgId();
+    const userRole = getCurrentUserRole(user, currentOrgId);
 
     const deleteMutation = useMutation({
         mutationFn: () => api.delete(`/tasks/${task.id}/`),
@@ -26,7 +29,7 @@ const TaskActions = ({ task }) => {
 
     return (
         <div className="flex gap-2 items-center shrink-0">
-            {canDeleteTask(user?.role) && (
+            {canDeleteTask(userRole) && (
                 <button
                     onClick={handleDelete}
                     disabled={deleteMutation.isPending}

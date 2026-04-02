@@ -1,19 +1,25 @@
-let accessToken = null
-let refreshToken = null
-let organizationId = null
 let currentUser = null
 
 export const setAuth = (access, refresh, orgId) => {
-  accessToken = access
-  refreshToken = refresh
-  organizationId = orgId
+  if (access) localStorage.setItem("access_token", access)
+  if (refresh) localStorage.setItem("refresh_token", refresh)
+  if (orgId) localStorage.setItem("organization_id", orgId)
 }
 
-export const getToken = () => accessToken
+export const getToken = () => localStorage.getItem("access_token")
 
-export const getRefreshToken = () => refreshToken
+export const getRefreshToken = () => localStorage.getItem("refresh_token")
 
-export const getOrgId = () => organizationId
+export const getOrgId = () => localStorage.getItem("organization_id")
+
+export const setOrgId = (orgId) => {
+  if (orgId) {
+    localStorage.setItem("organization_id", orgId)
+    return
+  }
+
+  localStorage.removeItem("organization_id")
+}
 
 export const getUser = () => currentUser
 
@@ -22,22 +28,22 @@ export const setUser = (user) => {
 }
 
 export const setToken = (token) => {
-  accessToken = token
+  if (token) localStorage.setItem("access_token", token)
 }
 
-export const logout = () => {
-  accessToken = null
-  refreshToken = null
-  organizationId = null
+export const logout = (skipRedirect = false) => {
+  localStorage.removeItem("access_token")
+  localStorage.removeItem("refresh_token")
+  localStorage.removeItem("organization_id")
   currentUser = null
 
   // Cleanly navigate to login if not already there, wiping state
-  if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+  if (!skipRedirect && typeof window !== "undefined" && window.location.pathname !== "/login") {
     window.location.href = "/login"
   }
 }
 
 export const isAuthenticated = () => {
   // A valid session requires both token and organizationId
-  return !!accessToken && !!organizationId
+  return !!localStorage.getItem("access_token") && !!localStorage.getItem("organization_id")
 }

@@ -17,8 +17,19 @@ export default function GlobalSearchBar() {
     const debouncedQuery = useDebounce(query, 300);
     const { data, isLoading } = useGlobalSearch(debouncedQuery);
 
-    const projects = data?.projects?.slice(0, 5) || [];
-    const tasks = data?.tasks?.slice(0, 5) || [];
+    const safeFilter = (items, key) => {
+        if (!items) return [];
+        const q = (debouncedQuery || "").toLowerCase().trim();
+        if (!q) return items;
+        return items.filter(item => {
+            const val = item[key] || '';
+            const subtitle = item.public_id || item.project?.name || '';
+            return val.toLowerCase().includes(q) || subtitle.toLowerCase().includes(q);
+        });
+    };
+
+    const projects = safeFilter(data?.projects, 'name').slice(0, 5);
+    const tasks = safeFilter(data?.tasks, 'title').slice(0, 5);
     const flattenedResults = [
         ...projects.map(p => ({ type: 'project', data: p })),
         ...tasks.map(t => ({ type: 'task', data: t }))
@@ -80,10 +91,10 @@ export default function GlobalSearchBar() {
         setQuery('');
         
         if (item.type === 'project') {
-            navigate(`/projects/${item.data.public_id || item.data.id}`);
+            navigate(`/projects/${item.data.public_id || item.data.id}/board`);
         } else if (item.type === 'task') {
             const projectId = item.data.project?.public_id || item.data.project?.id || item.data.project;
-            navigate(`/projects/${projectId}`);
+            navigate(`/projects/${projectId}/board?task=${item.data.id}`);
         }
     };
 

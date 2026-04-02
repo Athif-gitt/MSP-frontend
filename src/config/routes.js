@@ -1,4 +1,8 @@
 export const ROUTES = {
-    PROFILE: "/profile",
-    SETTINGS: "/settings",
+  HOME: "/",
+  DASHBOARD: "/dashboard",
+  PROJECTS: "/projects",
+  TRASH: "/trash",
+  LOGIN: "/login",
+  REGISTER: "/register"
 };

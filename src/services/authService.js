@@ -13,14 +13,14 @@ export const login = async (credentials) => {
   return res.data
 }
 
-export const logout = async () => {
+export const logout = async (skipRedirect = false) => {
   try {
     await api.post("/auth/logout/")
   } catch (error) {
     // Ignore server error and still clear local auth state
     console.warn("Logout API returned error:", error)
   } finally {
-    clearAuth()
+    clearAuth(skipRedirect)
   }
 }
 
@@ -31,5 +31,10 @@ export const signup = async (data) => {
 
 export const getCurrentUser = async () => {
   const res = await api.get("/auth/me/")
+  return res.data
+}
+
+export const updateProfile = async (data) => {
+  const res = await api.patch("/auth/me/", data)
   return res.data
 }

@@ -65,13 +65,19 @@ const BoardPage = () => {
 
             {/* Board Container */}
             <div className="flex-1 overflow-hidden">
-                <Board projectId={projectId} />
+                {project ? (
+                    <Board projectId={project.id} />
+                ) : (
+                    <div className="flex items-center justify-center p-12 text-slate-400 gap-2">
+                        <span className="text-sm font-medium">Loading project details...</span>
+                    </div>
+                )}
             </div>
 
             {/* Create Task Modal */}
-            {isCreateOpen && (
+            {isCreateOpen && project && (
                 <CreateTaskModal
-                    projectId={projectId}
+                    projectId={project.id}
                     onClose={() => setIsCreateOpen(false)}
                 />
             )}

@@ -3,7 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Navigate } from "react-router-dom"
 import api from "../services/api"
 import { useAuth } from "../context/AuthContext"
-import { canViewTrash, canRestoreTask, canDeleteTask } from "../utils/permissions"
+import { canViewTrash, canRestoreTask, canDeleteTask, getCurrentUserRole } from "../utils/permissions"
+import { getOrgId } from "../utils/authStore"
 
 import ConfirmModal from "../components/ConfirmModal"
 import Toast from "../components/Toast"
@@ -11,6 +12,8 @@ import Toast from "../components/Toast"
 const Trash = () => {
   const queryClient = useQueryClient()
   const { user } = useAuth()
+  const currentOrgId = getOrgId()
+  const userRole = getCurrentUserRole(user, currentOrgId)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedIds, setSelectedIds] = useState([])
@@ -100,10 +103,15 @@ const Trash = () => {
     mutationFn: () => api.delete("/tasks/empty_trash/"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trash"] })
+      queryClient.invalidateQueries({ queryKey: ["tasks"] })
       setToastConfig({ type: "success", message: "Trash emptied" })
       setSelectedIds([])
       setModalConfig({ isOpen: false })
     },
+    onError: () => {
+      setToastConfig({ type: "error", message: "Failed to empty trash." })
+      setModalConfig({ isOpen: false })
+    }
   })
 
   const processedItems = useMemo(() => {
@@ -133,10 +141,30 @@ const Trash = () => {
     }
   }
 
-  const canEdit = canRestoreTask(user?.role) || canDeleteTask(user?.role)
+  const canEdit = canRestoreTask(userRole) || canDeleteTask(userRole)
 
-  if (!user || !canViewTrash(user?.role)) {
+  if (!user) {
     return <Navigate to="/dashboard" replace />
+  }
+
+  if (!canViewTrash(userRole)) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  const handleConfirm = () => {
+    if (modalConfig.type === "empty") {
+      emptyTrashMutation.mutate()
+      return
+    }
+
+    if (modalConfig.type === "restore") {
+      restoreMutation.mutate(modalConfig.payload)
+      return
+    }
+
+    if (modalConfig.type === "delete") {
+      hardDeleteMutation.mutate(modalConfig.payload)
+    }
   }
 
   if (isLoading) {
@@ -181,7 +209,7 @@ const Trash = () => {
               />
             </div>
 
-            {canDeleteTask(user?.role) && trashedItems.length > 0 && (
+            {canDeleteTask(userRole) && trashedItems.length > 0 && (
               <button
                 onClick={() => setModalConfig({ isOpen: true, type: "empty" })}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg shadow-sm"
@@ -279,18 +307,30 @@ const Trash = () => {
 
             <div className="flex gap-2">
 
-              {canRestoreTask(user?.role) && (
+              {canRestoreTask(userRole) && (
                 <button
-                  onClick={() => restoreMutation.mutate(item.id)}
+                  onClick={() =>
+                    setModalConfig({
+                      isOpen: true,
+                      type: "restore",
+                      payload: item.id,
+                    })
+                  }
                   className="px-3 py-1.5 text-sm bg-slate-100 rounded-lg hover:bg-primary hover:text-white transition"
                 >
                   Restore
                 </button>
               )}
 
-              {canDeleteTask(user?.role) && (
+              {canDeleteTask(userRole) && (
                 <button
-                  onClick={() => hardDeleteMutation.mutate(item.id)}
+                  onClick={() =>
+                    setModalConfig({
+                      isOpen: true,
+                      type: "delete",
+                      payload: item.id,
+                    })
+                  }
                   className="px-3 py-1.5 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition"
                 >
                   Delete
@@ -304,8 +344,35 @@ const Trash = () => {
 
       <ConfirmModal
         isOpen={modalConfig.isOpen}
-        onClose={() => setModalConfig({ isOpen: false })}
-        onConfirm={() => {}}
+        onClose={() => setModalConfig({ isOpen: false, type: null, payload: null })}
+        onConfirm={handleConfirm}
+        title={
+          modalConfig.type === "empty"
+            ? "Empty Trash"
+            : modalConfig.type === "restore"
+              ? "Restore Task"
+              : "Delete Permanently"
+        }
+        message={
+          modalConfig.type === "empty"
+            ? "This will permanently delete all tasks in trash for the current organization."
+            : modalConfig.type === "restore"
+              ? "This task will be restored back to the active task list."
+              : "This task will be permanently deleted and cannot be recovered."
+        }
+        confirmText={
+          modalConfig.type === "empty"
+            ? "Empty Trash"
+            : modalConfig.type === "restore"
+              ? "Restore"
+              : "Delete"
+        }
+        isDanger={modalConfig.type !== "restore"}
+        isLoading={
+          emptyTrashMutation.isPending ||
+          restoreMutation.isPending ||
+          hardDeleteMutation.isPending
+        }
       />
 
       {toastConfig && (

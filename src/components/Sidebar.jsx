@@ -1,17 +1,21 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FolderOpen, CheckSquare, Activity, Settings, Trash2 } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, FolderOpen, Activity, Settings, Trash2, Users } from 'lucide-react';
+import { ROUTES } from '../config/routes';
 
 const Sidebar = () => {
+    const location = useLocation();
+
     const navItems = [
-        { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        { to: '/projects', icon: FolderOpen, label: 'Projects' },
+        { to: ROUTES.DASHBOARD, icon: LayoutDashboard, label: 'Dashboard' },
+        { to: ROUTES.PROJECTS, icon: FolderOpen, label: 'Projects' },
+        { to: '/members', icon: Users, label: 'Members' },
         { to: '#activity', icon: Activity, label: 'Activity' },
     ];
 
     const systemItems = [
-        { to: '#settings', icon: Settings, label: 'Settings' },
-        { to: '/trash', icon: Trash2, label: 'Trash' },
+        { to: '/profile', icon: Settings, label: 'Settings' },
+        { to: ROUTES.TRASH, icon: Trash2, label: 'Trash' },
     ];
 
     return (
@@ -25,39 +29,41 @@ const Sidebar = () => {
             <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     <p className="px-3 text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-2">Main Menu</p>
-                    {navItems.map((item) => (
-                        <NavLink
-                            key={item.label}
-                            to={item.to}
-                            className={({ isActive }) =>
-                                `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded transition-colors ${isActive
-                                    ? 'bg-blue-50 text-[#2563EB]'
-                                    : 'text-slate-600 hover:bg-slate-50'
-                                }`
-                            }
-                        >
-                            <item.icon size={18} strokeWidth={1.5} className="text-slate-400 shrink-0" />
-                            {item.label}
-                        </NavLink>
-                    ))}
+                    {navItems.map((item) => {
+                        const isActive = item.to.startsWith('/') ? location.pathname.startsWith(item.to) : false;
+                        return (
+                            <Link
+                                key={item.label}
+                                to={item.to}
+                                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded transition-colors ${isActive
+                                        ? 'bg-blue-50 text-[#2563EB]'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                    }`}
+                            >
+                                <item.icon size={18} strokeWidth={1.5} className="text-slate-400 shrink-0" />
+                                {item.label}
+                            </Link>
+                        );
+                    })}
                 </div>
                 <div className="py-2 mt-4">
                     <p className="px-3 text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-2">System</p>
-                    {systemItems.map((item) => (
-                        <NavLink
-                            key={item.label}
-                            to={item.to}
-                            className={({ isActive }) =>
-                                `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded transition-colors ${isActive
-                                    ? 'bg-blue-50 text-[#2563EB]'
-                                    : 'text-slate-600 hover:bg-slate-50'
-                                }`
-                            }
-                        >
-                            <item.icon size={18} strokeWidth={1.5} className="text-slate-400 shrink-0" />
-                            {item.label}
-                        </NavLink>
-                    ))}
+                    {systemItems.map((item) => {
+                        const isActive = item.to.startsWith('/') ? location.pathname.startsWith(item.to) : false;
+                        return (
+                            <Link
+                                key={item.label}
+                                to={item.to}
+                                className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded transition-colors ${isActive
+                                        ? 'bg-blue-50 text-[#2563EB]'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                    }`}
+                            >
+                                <item.icon size={18} strokeWidth={1.5} className="text-slate-400 shrink-0" />
+                                {item.label}
+                            </Link>
+                        );
+                    })}
                 </div>
             </nav>
             <div className="p-4 border-t border-[#E5E7EB]">

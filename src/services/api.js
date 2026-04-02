@@ -27,7 +27,13 @@ const processQueue = (error, token = null) => {
 };
 
 // Endpoints that do not require authentication headers
-const PUBLIC_ENDPOINTS = ["/auth/login/", "/auth/register/", "/auth/refresh/", "/auth/logout/"];
+const PUBLIC_ENDPOINTS = [
+  "/auth/login/", 
+  "/auth/register/", 
+  "/auth/refresh/", 
+  "/auth/logout/",
+  "/organizations/invitations/validate/"
+];
 
 /*
 REQUEST INTERCEPTOR

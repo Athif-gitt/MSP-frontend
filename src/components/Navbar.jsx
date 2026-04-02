@@ -3,11 +3,13 @@ import { HelpCircle } from 'lucide-react';
 import ProfileDropdown from './ProfileDropdown';
 import NotificationBell from './notifications/NotificationBell';
 import GlobalSearchBar from './search/GlobalSearchBar';
+import OrgSwitcher from './OrgSwitcher';
 
 const Navbar = () => {
     return (
         <header className="h-[72px] border-b border-[#E5E7EB] bg-white flex items-center justify-between px-8 shrink-0">
-            <div className="flex items-center flex-1 max-w-xl">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+                <OrgSwitcher />
                 <GlobalSearchBar />
             </div>
             <div className="flex items-center gap-4 ml-8">
