@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
+import { Plus } from "lucide-react";
 import InviteMemberModal from './InviteMemberModal';
 
-export default function InviteMemberButton() {
+export default function InviteMemberButton({ disabled = false }: { disabled?: boolean }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <button
+        type="button"
+        disabled={disabled}
         onClick={() => setIsModalOpen(true)}
-        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow-sm shadow-blue-600/20 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-        </svg>
+        <Plus className="h-4 w-4" />
         Invite Member
       </button>
       

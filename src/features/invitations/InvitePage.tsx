@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 import { useValidateInvitation, useAcceptInvitation } from "./hooks";
 import InviteCard from "./components/InviteCard";
 import InviteError from "./components/InviteError";
 import InviteSuccess from "./components/InviteSuccess";
 import { ROUTES } from "../../config/routes";
+import { getCurrentUser } from "../../services/authService";
+import { setOrgId } from "../../utils/authStore";
 
 export default function InvitePage() {
   const { token } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isLoading: isAuthLoading, logout } = useAuth();
+  const queryClient = useQueryClient();
+  const { user, setUser, isLoading: isAuthLoading, logout } = useAuth();
   
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -43,11 +47,34 @@ export default function InvitePage() {
   const handleAccept = () => {
     if (!token || !user) return;
     acceptInvite(token, {
-      onSuccess: () => {
-        setIsSuccess(true);
-        setTimeout(() => {
-          navigate(ROUTES.DASHBOARD);
-        }, 2000);
+      onSuccess: async () => {
+        try {
+          const refreshedUser = await getCurrentUser();
+          setUser(refreshedUser);
+
+          const invitedOrgName =
+            inviteData?.organization_name || inviteData?.organization;
+
+          const joinedOrg = refreshedUser?.organizations?.find(
+            (org: any) => org.name === invitedOrgName
+          );
+
+          if (joinedOrg?.id) {
+            setOrgId(String(joinedOrg.id));
+          }
+
+          queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+          queryClient.invalidateQueries({ queryKey: ["projects"] });
+          queryClient.invalidateQueries({ queryKey: ["tasks"] });
+          queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        } catch {
+          // If refresh fails, still show success and let normal auth boot recover on navigation.
+        } finally {
+          setIsSuccess(true);
+          setTimeout(() => {
+            navigate(ROUTES.DASHBOARD);
+          }, 2000);
+        }
       },
       onError: (err: any) => {
         // Fallback error handling if API fails specifically on accept
@@ -140,10 +167,16 @@ export default function InvitePage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       {isSuccess ? (
-        <InviteSuccess organizationName={inviteData?.organization_name || "the organization"} />
+        <InviteSuccess
+          organizationName={
+            inviteData?.organization_name || inviteData?.organization || "the organization"
+          }
+        />
       ) : (
         <InviteCard
-          organizationName={inviteData?.organization_name || "Organization"}
+          organizationName={
+            inviteData?.organization_name || inviteData?.organization || "Organization"
+          }
           role={inviteData?.role || "Member"}
           invitedByEmail={inviteData?.invited_by_email || "the admin"}
           onAccept={handleAccept}
