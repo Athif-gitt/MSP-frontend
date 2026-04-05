@@ -32,7 +32,14 @@ const PUBLIC_ENDPOINTS = [
   "/auth/register/", 
   "/auth/refresh/", 
   "/auth/logout/",
+  "/auth/forgot-password/",
+  "/auth/reset-password/",
   "/organizations/invitations/validate/"
+];
+
+const ORG_OPTIONAL_ENDPOINTS = [
+  "/auth/me/",
+  "/organizations/invitations/accept/",
 ];
 
 /*
@@ -42,13 +49,17 @@ Attach access token + organization id
 api.interceptors.request.use(
   (config) => {
     const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
+    const allowsMissingOrg = ORG_OPTIONAL_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
     const token = getToken();
     const orgId = getOrgId();
 
     if (!isPublic) {
-      // Prevent unauthenticated API requests client-side
-      if (!token || !orgId) {
-        return Promise.reject(new axios.Cancel("Missing authentication or organization context. Request cancelled."));
+      if (!token) {
+        return Promise.reject(new axios.Cancel("Missing authentication context. Request cancelled."));
+      }
+
+      if (!orgId && !allowsMissingOrg) {
+        return Promise.reject(new axios.Cancel("Missing organization context. Request cancelled."));
       }
     }
 

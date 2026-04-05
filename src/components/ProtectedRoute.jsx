@@ -1,6 +1,7 @@
 import React from "react"
 import { Navigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
+import { getOrgId } from "../utils/authStore"
 
 export default function ProtectedRoute({ children }) {
   const { user, isLoading } = useAuth()
@@ -14,6 +15,10 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (!getOrgId()) {
     return <Navigate to="/login" replace />
   }
 

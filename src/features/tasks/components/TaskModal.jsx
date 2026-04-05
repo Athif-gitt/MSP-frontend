@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, CircleAlert, X } from "lucide-react";
 import { useUpdateTask } from "../hooks/useUpdateTask";
 import CommentList from "../../comments/components/CommentList";
+import AISubtaskGenerator from "../../../components/tasks/AISubtaskGenerator";
 
 const STATUS_OPTIONS = [
   { value: "todo", label: "To Do" },
@@ -322,6 +323,22 @@ const TaskModal = ({ task, projectId, onClose }) => {
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-500">
               Changes sync automatically when a field loses focus or a select changes.
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                AI Workflow
+              </p>
+              <h3 className="mt-3 text-sm font-semibold text-slate-900">
+                Break this task into subtasks
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                Generate a draft, refine it, and save only the subtasks you want to keep.
+              </p>
+
+              <div className="mt-4">
+                <AISubtaskGenerator taskId={task.id} />
+              </div>
             </div>
           </div>
         </div>

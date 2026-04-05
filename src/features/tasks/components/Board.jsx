@@ -55,6 +55,7 @@ const Board = ({ projectId }) => {
   const [activeTaskId, setActiveTaskId] = useState(null);
   const [previewTasks, setPreviewTasks] = useState(null);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [lastOverStatus, setLastOverStatus] = useState(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -79,11 +80,13 @@ const Board = ({ projectId }) => {
 
   const handleDragStart = (event) => {
     setActiveTaskId(event.active.id);
+    setLastOverStatus(normalizeTaskStatus(event.active.data.current?.task?.status));
   };
 
   const handleDragCancel = () => {
     setActiveTaskId(null);
     setPreviewTasks(null);
+    setLastOverStatus(null);
   };
 
   const handleDragOver = (event) => {
@@ -99,14 +102,16 @@ const Board = ({ projectId }) => {
       return;
     }
 
+    setLastOverStatus(nextStatus);
     setPreviewTasks(moveTask(sourceTasks, activeTask.id, nextStatus));
   };
 
   const handleDragEnd = (event) => {
     const draggedTask = event.active.data.current?.task;
-    const nextStatus = getDropStatus(event.over);
+    const nextStatus = getDropStatus(event.over) ?? lastOverStatus;
 
     setActiveTaskId(null);
+    setLastOverStatus(null);
 
     if (
       !draggedTask ||

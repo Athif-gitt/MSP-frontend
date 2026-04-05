@@ -3,7 +3,13 @@ let currentUser = null
 export const setAuth = (access, refresh, orgId) => {
   if (access) localStorage.setItem("access_token", access)
   if (refresh) localStorage.setItem("refresh_token", refresh)
-  if (orgId) localStorage.setItem("organization_id", orgId)
+
+  if (orgId) {
+    localStorage.setItem("organization_id", orgId)
+    return
+  }
+
+  localStorage.removeItem("organization_id")
 }
 
 export const getToken = () => localStorage.getItem("access_token")
@@ -11,6 +17,10 @@ export const getToken = () => localStorage.getItem("access_token")
 export const getRefreshToken = () => localStorage.getItem("refresh_token")
 
 export const getOrgId = () => localStorage.getItem("organization_id")
+
+export const hasToken = () => !!localStorage.getItem("access_token")
+
+export const hasOrganizationContext = () => !!localStorage.getItem("organization_id")
 
 export const setOrgId = (orgId) => {
   if (orgId) {
@@ -44,6 +54,5 @@ export const logout = (skipRedirect = false) => {
 }
 
 export const isAuthenticated = () => {
-  // A valid session requires both token and organizationId
-  return !!localStorage.getItem("access_token") && !!localStorage.getItem("organization_id")
+  return hasToken()
 }

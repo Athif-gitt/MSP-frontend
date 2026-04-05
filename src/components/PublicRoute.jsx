@@ -1,10 +1,12 @@
 import React from "react"
 import { Navigate, useLocation, Outlet } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
+import { getOrgId } from "../utils/authStore"
 
 export default function PublicRoute() {
   const { user, isLoading } = useAuth()
   const location = useLocation()
+  const orgId = getOrgId()
 
   if (isLoading) {
     return (
@@ -14,7 +16,7 @@ export default function PublicRoute() {
     )
   }
 
-  if (user) {
+  if (user && orgId) {
     // If accessing login/register but already logged in, go to dashboard.
     // Preserving the previous intended route logic or just strictly dashboard.
     const searchParams = new URLSearchParams(location.search)

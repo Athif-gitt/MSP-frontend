@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
     initAuth()
   }, [])
 
-  const login = async (credentials) => {
-    const data = await loginService(credentials)
+  const login = async (credentials, options = {}) => {
+    const data = await loginService(credentials, options)
     // Attempt to set auth globally. Depending on payload, we may need to fetch `/me` again.
     // If backend returns user directly inside login payload:
     if (data.user) {
@@ -37,6 +37,8 @@ export const AuthProvider = ({ children }) => {
       const userData = await getCurrentUser()
       setUser(userData)
     }
+
+    return data
   }
 
   const logout = async (skipRedirect = false) => {
