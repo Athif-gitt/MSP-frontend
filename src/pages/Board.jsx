@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Board from '../features/tasks/components/Board';
 import CreateTaskModal from '../components/tasks/CreateTaskModal';
 import { ChevronLeft } from 'lucide-react';
-import { getProjectById } from "../services/projectService";
+import { getProjectByIdentifier } from "../services/projectService";
 import { useQuery } from "@tanstack/react-query";
 
 const BoardPage = () => {
@@ -13,9 +13,10 @@ const BoardPage = () => {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     const { data: project, isLoading } = useQuery({
-  queryKey: ["project", projectId],
-  queryFn: () => getProjectById(projectId),
-});
+        queryKey: ["project", projectId],
+        queryFn: () => getProjectByIdentifier(projectId),
+        enabled: Boolean(projectId),
+    });
 
     return (
         <div className="flex flex-col h-full bg-[#F9FAFB]">
@@ -67,9 +68,13 @@ const BoardPage = () => {
             <div className="flex-1 overflow-hidden">
                 {project ? (
                     <Board projectId={project.id} />
-                ) : (
+                ) : isLoading ? (
                     <div className="flex items-center justify-center p-12 text-slate-400 gap-2">
                         <span className="text-sm font-medium">Loading project details...</span>
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-center p-12 text-slate-400 gap-2">
+                        <span className="text-sm font-medium">Project not found.</span>
                     </div>
                 )}
             </div>
