@@ -10,6 +10,7 @@ const ActivityFeed = () => {
                 <div className="relative space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-slate-100 dark:before:bg-slate-800">
                     
                     <div className="relative flex gap-4 pl-8">
+                        
                         <div className="absolute left-0 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-slate-900"></div>
                         <div>
                             <p className="text-sm font-medium text-slate-900 dark:text-white leading-tight">Sarah Chen completed <span className="text-primary font-semibold">User Authentication</span></p>
