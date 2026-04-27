@@ -9,6 +9,7 @@ import Members from "./pages/Members";
 import Board from "./pages/Board";
 import Trash from "./pages/Trash";
 import Login from "./pages/Login";
+import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -26,6 +27,14 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
+            <Route element={<PublicRoute />}>
+              <Route path={ROUTES.HOME} element={<Home />} />
+              <Route path={ROUTES.LOGIN} element={<Login />} />
+              <Route path={ROUTES.REGISTER} element={<Register />} />
+              <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
+              <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
+            </Route>
+
             <Route
               path="/"
               element={
@@ -34,20 +43,12 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="projects" element={<Projects />} />
               <Route path="members" element={<Members />} />
               <Route path="projects/:projectId/board" element={<Board />} />
               <Route path="trash" element={<Trash />} />
               <Route path="profile" element={<Profile />} />
-            </Route>
-
-            <Route element={<PublicRoute />}>
-              <Route path={ROUTES.LOGIN} element={<Login />} />
-              <Route path={ROUTES.REGISTER} element={<Register />} />
-              <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
-              <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
             </Route>
             
             <Route path="/invite/:token" element={<InvitePage />} />
