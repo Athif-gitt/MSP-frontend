@@ -11,6 +11,7 @@ const Navbar = () => {
             <div className="flex items-center gap-4 flex-1 min-w-0">
                 <OrgSwitcher />
                 <GlobalSearchBar />
+                
             </div>
             <div className="flex items-center gap-4 ml-8">
                 <NotificationBell />
